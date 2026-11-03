@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MindMetric – Student Mental Health Score Estimator</title>
+  <meta name="description" content="Estimate a student's mental health score from social media and lifestyle habits using a machine learning model." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============ Navigation ============ -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" href="#top" aria-label="MindMetric home">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5" opacity=".35"/>
+        <path d="M6 17h5l3-7 4 13 3-9 2 3h3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>MindMetric</span>
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mainNav" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="nav" id="mainNav" aria-label="Main">
+      <a href="#predict">Estimator</a>
+      <a href="#how">How it works</a>
+      <a href="#disclaimer">Disclaimer</a>
+    </nav>
+
+    <button class="status" id="apiStatus" type="button" data-state="checking" title="Click to re-check the backend connection">
+      <span class="status__dot" aria-hidden="true"></span>
+      <span class="status__text" id="apiStatusText">Checking server…</span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ Intro ============ -->
+  <section class="intro">
+    <div class="intro__inner">
+      <h1>How do daily habits relate to a student's mental health score?</h1>
+      <p>Enter details about social media use, sleep, study and stress. A trained machine learning model returns an estimated score in a few seconds.</p>
+      <a class="btn btn--light" href="#predict">Start estimate</a>
+    </div>
+  </section>
+
+  <!-- ============ Estimator ============ -->
+  <section class="workspace" id="predict" aria-labelledby="formTitle">
+    <h2 id="formTitle" class="visually-hidden">Prediction form</h2>
+
+    <form id="predictForm" class="form" novalidate>
+
+      <fieldset class="card">
+        <legend>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+          Student profile
+        </legend>
+        <div class="grid">
+          <div class="field">
+            <label for="Age">Age</label>
+            <input type="number" id="Age" name="Age" inputmode="numeric" min="10" max="100" step="1" placeholder="e.g. 21" required />
+            <small class="hint">Whole number, 10 to 100.</small>
+            <span class="error" id="err-Age" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="Gender">Gender</label>
+            <select id="Gender" name="Gender" required>
+              <option value="" selected disabled>Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            <span class="error" id="err-Gender" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="Country">Country</label>
+            <input type="text" id="Country" name="Country" list="countryList" maxlength="60" placeholder="e.g. India" autocomplete="off" required />
+            <datalist id="countryList">
+              <option value="India"></option><option value="USA"></option><option value="Canada"></option>
+              <option value="Australia"></option><option value="UK"></option><option value="Germany"></option>
+              <option value="Mexico"></option><option value="Turkey"></option><option value="France"></option>
+              <option value="Other"></option>
+            </datalist>
+            <small class="hint">Countries the model doesn't know are treated as "Other".</small>
+            <span class="error" id="err-Country" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="Academic_Level">Academic level</label>
+            <select id="Academic_Level" name="Academic_Level" required>
+              <option value="" selected disabled>Select level</option>
+              <option value="High School">High School</option>
+              <option value="Undergraduate">Undergraduate</option>
+              <option value="Graduate">Graduate</option>
+            </select>
+            <span class="error" id="err-Academic_Level" role="alert"></span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="card">
+        <legend>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg>
+          Social media habits
+        </legend>
+        <div class="grid">
+          <div class="field">
+            <label for="Most_Used_Platform">Most used platform</label>
+            <select id="Most_Used_Platform" name="Most_Used_Platform" required>
+              <option value="" selected disabled>Select platform</option>
+              <option>Instagram</option><option>TikTok</option><option>Facebook</option>
+              <option>LinkedIn</option><option>YouTube</option><option>Twitter</option>
+              <option>Snapchat</option><option>WhatsApp</option><option>LINE</option>
+              <option>VKontakte</option><option>KakaoTalk</option><option>WeChat</option>
+            </select>
+            <span class="error" id="err-Most_Used_Platform" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="Purpose_Of_Use">Main purpose of use</label>
+            <select id="Purpose_Of_Use" name="Purpose_Of_Use" required>
+              <option value="" selected disabled>Select purpose</option>
+              <option value="networking">Networking</option>
+              <option value="Education">Education</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="News">News</option>
+            </select>
+            <span class="error" id="err-Purpose_Of_Use" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="Avg_Daily_Usage_Hours">Average daily usage (hours)</label>
+            <input type="number" id="Avg_Daily_Usage_Hours" name="Avg_Daily_Usage_Hours" inputmode="decimal" min="0" max="24" step="0.1" placeholder="e.g. 4.5" required />
+            <small class="hint">0 to 24 hours.</small>
+            <span class="error" id="err-Avg_Daily_Usage_Hours" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="Daily_Unlocks">Phone unlocks per day</label>
+            <input type="number" id="Daily_Unlocks" name="Daily_Unlocks" inputmode="numeric" min="0" step="1" placeholder="e.g. 60" required />
+            <small class="hint">Whole number, 0 or more.</small>
+            <span class="error" id="err-Daily_Unlocks" role="alert"></span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="card">
+        <legend>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+          Daily routine and wellbeing
+        </legend>
+        <div class="grid">
+          <div class="field">
+            <label for="Study_Hours">Study hours per day</label>
+            <input type="number" id="Study_Hours" name="Study_Hours" inputmode="decimal" min="0" max="24" step="0.1" placeholder="e.g. 3" required />
+            <small class="hint">0 to 24 hours.</small>
+            <span class="error" id="err-Study_Hours" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="Physical_Activity_Hours">Physical activity hours per day</label>
+            <input type="number" id="Physical_Activity_Hours" name="Physical_Activity_Hours" inputmode="decimal" min="0" max="24" step="0.1" placeholder="e.g. 1" required />
+            <small class="hint">0 to 24 hours.</small>
+            <span class="error" id="err-Physical_Activity_Hours" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="Sleep_Hours_Per_Night">Sleep hours per night</label>
+            <input type="number" id="Sleep_Hours_Per_Night" name="Sleep_Hours_Per_Night" inputmode="decimal" min="0" max="24" step="0.1" placeholder="e.g. 7" required />
+            <small class="hint">0 to 24 hours.</small>
+            <span class="error" id="err-Sleep_Hours_Per_Night" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="Stress_Level">Stress level</label>
+            <select id="Stress_Level" name="Stress_Level" required>
+              <option value="" selected disabled>Select stress level</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Very High">Very High</option>
+            </select>
+            <span class="error" id="err-Stress_Level" role="alert"></span>
+          </div>
+        </div>
+        <p class="warn" id="timeWarning" hidden>Study, physical activity and sleep add up to more than 24 hours. Check these values.</p>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit" class="btn btn--primary" id="submitBtn">
+          <span class="btn__spinner" aria-hidden="true"></span>
+          <span class="btn__label">Estimate score</span>
+        </button>
+        <button type="button" class="btn btn--ghost" id="clearBtn">Clear form</button>
+      </div>
+    </form>
+
+    <!-- ============ Result panel ============ -->
+    <aside class="result" id="resultPanel" aria-live="polite" aria-label="Prediction result">
+      <div class="result__state" id="stateIdle">
+        <svg class="result__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+        <h3>Your estimate appears here</h3>
+        <p>Complete the form and select Estimate score.</p>
+      </div>
+
+      <div class="result__state" id="stateLoading" hidden>
+        <div class="loader" aria-hidden="true"><span></span><span></span><span></span></div>
+        <h3>Analyzing your information…</h3>
+        <p>The model is processing your answers.</p>
+      </div>
+
+      <div class="result__state" id="stateResult" hidden>
+        <h3>Predicted mental health score</h3>
+        <div class="gauge">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="gauge__track" cx="60" cy="60" r="52"/>
+            <circle class="gauge__fill" id="gaugeFill" cx="60" cy="60" r="52"/>
+          </svg>
+          <div class="gauge__value"><strong id="scoreValue">–</strong><span id="scoreScale"></span></div>
+        </div>
+        <p class="result__note">Estimated by a machine learning model from the information you entered. Treat it as a rough indicator only.</p>
+        <button type="button" class="btn btn--primary" id="newPredictionBtn">Make another prediction</button>
+      </div>
+
+      <div class="result__state result__state--error" id="stateError" hidden>
+        <svg class="result__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+        <h3 id="errorTitle">Something went wrong</h3>
+        <p id="errorMessage"></p>
+        <button type="button" class="btn btn--ghost" id="dismissErrorBtn">Back to form</button>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ============ How it works ============ -->
+  <section class="info" id="how">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><strong>You enter your details.</strong> Twelve questions cover profile, social media habits and daily routine.</li>
+      <li><strong>The form is checked.</strong> Values are validated before anything is sent.</li>
+      <li><strong>The model estimates a score.</strong> Your answers go to the prediction service, which returns a single score.</li>
+    </ol>
+  </section>
+
+  <section class="info" id="disclaimer">
+    <div class="disclaimer">
+      <h2>Disclaimer</h2>
+      <p>This result is an estimate generated by a machine learning model. It is not a medical diagnosis and does not replace advice from a qualified mental health professional. If you are struggling, please talk to a doctor, counselor or someone you trust. If you may be in danger, contact your local emergency number.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>MindMetric · Machine learning project demo. Predictions are informational only.</p>
+</footer>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<script src="script.js"></script>
+</body>
+</html>
