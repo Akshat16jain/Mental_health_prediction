@@ -7,7 +7,7 @@
 
 /* ---------- Configuration ---------- */
 const CONFIG = {
-  API_BASE_URL: 'http://127.0.0.1:8000', // must match the port uvicorn is running on
+  API_BASE_URL: 'https://mental-health-prediction-onqh.onrender.com', // must match the port uvicorn is running on
   PREDICT_PATH: '/predict',
   REQUEST_TIMEOUT_MS: 30000,
   // The backend does not report the score's range. This only controls how full the
